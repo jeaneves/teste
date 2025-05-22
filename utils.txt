@@ -1,0 +1,70 @@
+-- Tabela para armazenar as categorias 
+CREATE TABLE categorias (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- Tabela para armazenar as marcas 
+CREATE TABLE marcas (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Tabela principal de Produtos
+CREATE TABLE produtos (
+    id INTEGER PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao TEXT,
+    id_categoria INTEGER REFERENCES categorias(id),
+    valor DECIMAL(10, 2) NOT NULL,
+    perc_desc DECIMAL(5, 2),
+    avaliacao DECIMAL(3, 2),
+    estoque INTEGER,
+    id_marca INTEGER REFERENCES marcas(id),
+    sku VARCHAR(50) UNIQUE,
+    peso DECIMAL(3,2), -- Assumindo unidade consistente, ex: gramas
+    largura DECIMAL(7, 2),
+    altura DECIMAL(7, 2),
+    profundidade DECIMAL(7, 2),
+    garantia VARCHAR(255),
+    envio VARCHAR(255),
+    disponibilidade VARCHAR(50),
+    pol_devolucao VARCHAR(100),
+    qtd_min INTEGER,
+    dt_criacao TIMESTAMPTZ,
+    dt_atualizado TIMESTAMPTZ,
+    barcode VARCHAR(50),
+    qr_code TEXT, 
+    thumbnail TEXT 
+);
+
+-- Tabela para Avaliações (Reviews)
+CREATE TABLE avaliacoes (
+    id SERIAL PRIMARY KEY, 
+    id_produto INTEGER NOT NULL REFERENCES produtos(id) ON DELETE CASCADE,
+    avaliacao INTEGER CHECK (rating >= 1 AND rating <= 5),
+    comentario TEXT,
+    data TIMESTAMPTZ NOT NULL,
+    nome VARCHAR(255),
+    email VARCHAR(255)
+);
+
+-- Tabela para Tags
+CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- Tabela de Junção Produto-Tags (Relação Muitos-para-Muitos)
+CREATE TABLE produto_tag (
+    id_produto INTEGER NOT NULL REFERENCES produtos(id) ON DELETE CASCADE,
+    tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+    PRIMARY KEY (id_produto, tag_id)
+);
+
+-- Tabela para Imagens Adicionais do Produto
+CREATE TABLE produto_imagem (
+    id SERIAL PRIMARY KEY,
+    id_produto INTEGER NOT NULL REFERENCES produtos(id) ON DELETE CASCADE,
+    image_url TEXT NOT NULL -- URL ou caminho da imagem
+);
